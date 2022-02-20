@@ -9,48 +9,59 @@ int rechtsAchter = 16;
 // Zwart wit sensor
 int rightSensor = 39; 
 int leftSensor = 34;
-int sensorValue = 0;
-int sensorValue2 = 0; 
+int rightSensorValue = 0;
+int leftSensorValue = 0; 
 
-void driveForwardStraight(int rechtsVoor, int linksVoor, int rechtsAchter, int linksAchter) 
-{
-  analogWrite(rechtsVoor, 212);
-  analogWrite(linksVoor, 187);
-  analogWrite(rechtsAchter, LOW);
-  analogWrite(linksAchter, LOW); 
-}
+//void driveForwardStraight(int rechtsVoor, int linksVoor, int rechtsAchter, int linksAchter) 
+//{
+//  analogWrite(rechtsVoor, 212);
+//  analogWrite(linksVoor, 187);
+//  analogWrite(rechtsAchter, LOW);
+//  analogWrite(linksAchter, LOW); 
+//}
 
 void showTapeOutput(int sensor, int sensor2)
 {
-  sensorValue = digitalRead (sensor);
-  sensorValue2 = digitalRead (sensor2);
+  rightSensorValue = digitalRead (sensor);
+  leftSensorValue = digitalRead (sensor2);
   Serial.print ("Right sensor: ");
-  Serial.print (sensorValue, DEC);
+  Serial.print (rightSensorValue, DEC);
   Serial.println("");
   Serial.print ("Left sensor: ");
-  Serial.print (sensorValue2, DEC);
+  Serial.print (rightSensorValue, DEC);
   Serial.println("");
 }
 
 void driveOverTape(int sensor, int sensor2) 
 {
-  sensorValue = digitalRead (sensor);
-  sensorValue2 = digitalRead (sensor2);
-  if (sensorValue == LOW && sensorValue2 == LOW)
+  rightSensorValue = digitalRead (sensor);
+  leftSensorValue = digitalRead (sensor2);
+  if (!(rightSensorValue) && !(leftSensorValue))
   {
-    rechtsVoor += 20;
-    linksVoor -= 20;
+    digitalWrite(linksVoor, LOW);
+    digitalWrite(rechtsVoor, LOW);
+    digitalWrite(linksAchter, LOW);
+    digitalWrite(rechtsAchter, LOW);
   }
-  else if (sensorValue2 < 2000 && sensorValue > 2000)
+  else if (rightSensorValue && !(leftSensorValue))
   {
-    rechtsVoor -= 20;
-    linksVoor += 20;
+    digitalWrite(linksVoor, LOW);
+    digitalWrite(rechtsVoor, HIGH);
+    digitalWrite(linksAchter, LOW);
+    digitalWrite(rechtsAchter, LOW);
   }
-  
+  else if (!(rightSensorValue) && leftSensorValue)
+  {
+    digitalWrite(linksVoor, HIGH);
+    digitalWrite(rechtsVoor, LOW);
+    digitalWrite(linksAchter, LOW);
+    digitalWrite(rechtsAchter, LOW);
+  }
 }
 
 void setup() {
   // put your setup code here, to run once:
+//  TCCR0B = TCCR0B & B11111000 | B00000010 ;
   pinMode(rechtsVoor, OUTPUT);
   pinMode(rechtsAchter, OUTPUT);
   pinMode(linksVoor, OUTPUT);
@@ -62,7 +73,7 @@ void setup() {
 
 void loop() {
 //  driveForwardStraight(rechtsVoor, linksVoor, rechtsAchter, linksAchter);
-  showTapeOutput(rightSensor, leftSensor);
-//  driveOverTape(rightSensor, leftSensor);
-  delay(1000);
+//  showTapeOutput(rightSensor, leftSensor);
+  driveOverTape(rightSensor, leftSensor);
+//  delay(1000);
 }
