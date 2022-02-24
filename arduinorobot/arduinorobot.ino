@@ -1,4 +1,6 @@
+#include <Arduino.h>
 #include <analogWrite.h>
+#include <MPU9250_asukiaaa.h>
 
 // Motor
 int rechtsVoor = 17;
@@ -11,6 +13,8 @@ int rightSensor = 39;
 int leftSensor = 34;
 int rightSensorValue = 0;
 int leftSensorValue = 0; 
+
+//adafruit vl53l0x
 
 void driveForwardStraight(int rechtsVoor, int linksVoor, int rechtsAchter, int linksAchter) 
 {
@@ -75,12 +79,12 @@ void setup() {
   pinMode(linksAchter, OUTPUT);
   pinMode(rightSensor, INPUT);
   pinMode(leftSensor, INPUT);
-  Serial.begin (9600);
+  Serial.begin (115200);
 }
 
 void loop() {
 //  driveForwardStraight(rechtsVoor, linksVoor, rechtsAchter, linksAchter);
 //  showTapeOutput(rightSensor, leftSensor);
-  driveOverTape(rightSensor, leftSensor, rechtsVoor, linksAchter, linksVoor, rechtsAchter);
+//  driveOverTape(rightSensor, leftSensor, rechtsVoor, linksAchter, linksVoor, rechtsAchter);
 //  delay(1000);
 }
