@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <analogWrite.h>
 #include <MPU9250_asukiaaa.h>
+#include <Adafruit_VL53L0X.h>
 
 // Motor
 int rechtsVoor = 17;
@@ -15,6 +16,7 @@ int rightSensorValue = 0;
 int leftSensorValue = 0; 
 
 //adafruit vl53l0x
+Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
 void driveForwardStraight(int rechtsVoor, int linksVoor, int rechtsAchter, int linksAchter) 
 {
@@ -70,6 +72,21 @@ void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int
   }
 }
 
+uint16_t measureDistance()
+{
+  VL53L0X_RangingMeasurementData_t measureDistance;
+
+  if (measureDistance.RangeStatus != 4) 
+  {
+    return measureDistance.RangeMilliMeter;
+  } 
+  else 
+  {
+    Serial.println(" out of range ");
+  }
+  delay(100);
+}
+
 void setup() {
   // put your setup code here, to run once:
 //  TCCR0B = TCCR0B & B11111000 | B00000010 ;
@@ -80,6 +97,19 @@ void setup() {
   pinMode(rightSensor, INPUT);
   pinMode(leftSensor, INPUT);
   Serial.begin (115200);
+
+  //Start serial monitor
+  while (!Serial) 
+  {
+    delay(1);
+  }
+
+  //check if VL53L0X starts up
+  if (!lox.begin())
+  {
+    Serial.println(F("Failed to boot VL53L0X"));
+    while(1);
+  }
 }
 
 void loop() {
