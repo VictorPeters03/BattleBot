@@ -38,6 +38,40 @@ void showTapeOutput(int sensor, int sensor2)
   Serial.println("");
 }
 
+//void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoor, int rechtsAchter) 
+//{
+//  rightSensorValue = digitalRead (sensor);
+//  leftSensorValue = digitalRead (sensor2);
+//  if (!(rightSensorValue) && !(leftSensorValue))
+//  {
+//    analogWrite(linksVoor, 180);
+//    analogWrite(rechtsVoor, 180);
+//    analogWrite(linksAchter, LOW);
+//    analogWrite(rechtsAchter, LOW);
+//  }
+//  else if (rightSensorValue && !(leftSensorValue))
+//  {
+//    analogWrite(linksVoor, 180);
+//    analogWrite(rechtsVoor, LOW);
+//    analogWrite(linksAchter, LOW);
+//    analogWrite(rechtsAchter, 180);
+//  }
+//  else if (!(rightSensorValue) && leftSensorValue)
+//  {
+//    analogWrite(linksVoor, LOW);
+//    analogWrite(rechtsVoor, 180);
+//    analogWrite(linksAchter, 180);
+//    analogWrite(rechtsAchter, LOW);
+//  }
+//  else 
+//  {
+//    analogWrite(linksVoor, 180);
+//    analogWrite(rechtsVoor, 180);
+//    analogWrite(linksAchter, LOW);
+//    analogWrite(rechtsAchter, LOW);
+//  }
+//}
+
 void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoor, int rechtsAchter) 
 {
   rightSensorValue = digitalRead (sensor);
@@ -51,24 +85,24 @@ void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int
   }
   else if (rightSensorValue && !(leftSensorValue))
   {
-    analogWrite(linksVoor, 200);
-    analogWrite(rechtsVoor, 100);
-    analogWrite(linksAchter, LOW);
+    analogWrite(linksVoor, LOW);
+    analogWrite(rechtsVoor, LOW);
+    analogWrite(linksAchter, 190);
     analogWrite(rechtsAchter, LOW);
   }
   else if (!(rightSensorValue) && leftSensorValue)
   {
-    analogWrite(linksVoor, 100);
-    analogWrite(rechtsVoor, 200);
+    analogWrite(linksVoor, LOW);
+    analogWrite(rechtsVoor, LOW);
     analogWrite(linksAchter, LOW);
-    analogWrite(rechtsAchter, HIGH);
+    analogWrite(rechtsAchter, 180);
   }
   else 
   {
-    analogWrite(linksVoor, 200);
-    analogWrite(rechtsVoor, 200);
-    analogWrite(linksAchter, LOW);
-    analogWrite(rechtsAchter, LOW);
+    analogWrite(linksVoor, LOW);
+    analogWrite(rechtsVoor, LOW);
+    analogWrite(linksAchter, 160);
+    analogWrite(rechtsAchter, 160);
   }
 }
 
@@ -115,6 +149,6 @@ void setup() {
 void loop() {
 //  driveForwardStraight(rechtsVoor, linksVoor, rechtsAchter, linksAchter);
 //  showTapeOutput(rightSensor, leftSensor);
-//  driveOverTape(rightSensor, leftSensor, rechtsVoor, linksAchter, linksVoor, rechtsAchter);
+  driveOverTape(rightSensor, leftSensor, rechtsVoor, linksAchter, linksVoor, rechtsAchter);
 //  delay(1000);
 }
