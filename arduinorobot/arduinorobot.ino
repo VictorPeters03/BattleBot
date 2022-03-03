@@ -79,7 +79,7 @@ void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int
   leftSensorValue = digitalRead (sensor2);
   if (!(rightSensorValue) && !(leftSensorValue))
   {
-    analogWrite(linksVoor, 158);
+    analogWrite(linksVoor, 160);
     analogWrite(rechtsVoor, 163);
     analogWrite(linksAchter, LOW);
     analogWrite(rechtsAchter, LOW);
@@ -87,13 +87,13 @@ void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int
   else if (rightSensorValue && !(leftSensorValue))
   {
     analogWrite(linksVoor, LOW);
-    analogWrite(rechtsVoor, 138);
-    analogWrite(linksAchter, 143);
+    analogWrite(rechtsVoor, LOW);
+    analogWrite(linksAchter, 148);
     analogWrite(rechtsAchter, LOW);
   }
   else if (!(rightSensorValue) && leftSensorValue)
   {
-    analogWrite(linksVoor, 138);
+    analogWrite(linksVoor, LOW);
     analogWrite(rechtsVoor, LOW);
     analogWrite(linksAchter, LOW);
     analogWrite(rechtsAchter, 143);
@@ -102,8 +102,8 @@ void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int
   {
     analogWrite(linksVoor, LOW);
     analogWrite(rechtsVoor, LOW);
-    analogWrite(linksAchter, 143);
-    analogWrite(rechtsAchter, 138);
+    analogWrite(linksAchter, 148);
+    analogWrite(rechtsAchter, 143);
   }
 }
 
