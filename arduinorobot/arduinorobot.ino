@@ -4,15 +4,15 @@
 #include <Adafruit_VL53L0X.h>
 
 // Motor
-int rechtsVoor = 17;
-int linksAchter = 18;
-int linksVoor = 5;
-int rechtsAchter = 16;
-int isStarted = 0;
+int rechtsVoor = 17; //Dit is linksachter bij de tweede driveOverTape functie
+int linksAchter = 18; //Dit is rechtsvoor bij de tweede driveOverTape functie
+int linksVoor = 5; //Dit is rechtsachter bij de tweede driveOverTape functie
+int rechtsAchter = 16; //Dit is linksvoor bij de tweede driveOverTape functie
+int isStarted = 0; //Deze gaat op 1 wanneer de robot 1 seconde lang gestart is
 
 // Zwart wit sensor
-int rightSensor = 39; 
-int leftSensor = 34;
+int rightSensor = 39; //Dit is de linkersensor bij driveOverTape 2 en 3 
+int leftSensor = 34; //Dit is de rechtersensor bij driveOverTape 2 en 3
 int rightSensorValue = 0;
 int leftSensorValue = 0; 
 
@@ -39,6 +39,8 @@ void showTapeOutput(int sensor, int sensor2)
   Serial.println("");
 }
 
+
+//Deze functie is voor de robot wanneer bij deze de twee dikke wielen vooraan staan.
 //void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoor, int rechtsAchter) 
 //{
 //  rightSensorValue = digitalRead (sensor);
@@ -73,6 +75,7 @@ void showTapeOutput(int sensor, int sensor2)
 //  }
 //}
 
+//Deze volgende 2 functies zijn voor de robot wanneer bij deze de twee dikke wielen achteraan staan.
 //void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoor, int rechtsAchter) 
 //{
 //  rightSensorValue = digitalRead (sensor);
@@ -115,22 +118,22 @@ void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int
   {
     analogWrite(linksVoor, LOW);
     analogWrite(rechtsVoor, LOW);
-    analogWrite(linksAchter, 163);
-    analogWrite(rechtsAchter, 158);
+    analogWrite(linksAchter, 138);
+    analogWrite(rechtsAchter, 133);
   }
   else if (rightSensorValue && !(leftSensorValue))
   {
     analogWrite(linksVoor, LOW);
     analogWrite(rechtsVoor, LOW);
-    analogWrite(linksAchter, LOW);
-    analogWrite(rechtsAchter, 143);
+    analogWrite(linksAchter, 178);
+    analogWrite(rechtsAchter, LOW);
   }
   else if (!(rightSensorValue) && leftSensorValue)
   {
     analogWrite(linksVoor, LOW);
     analogWrite(rechtsVoor, LOW);
-    analogWrite(linksAchter, 148);
-    analogWrite(rechtsAchter, LOW);
+    analogWrite(linksAchter, LOW);
+    analogWrite(rechtsAchter, 173);
   }
   else 
   {
@@ -141,6 +144,7 @@ void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int
   }
 }
 
+//Deze functie meet de afstand tussen de afstandsensor en een object.
 uint16_t measureDistance()
 {
   VL53L0X_RangingMeasurementData_t measureDistance;
