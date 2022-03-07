@@ -73,37 +73,71 @@ void showTapeOutput(int sensor, int sensor2)
 //  }
 //}
 
+//void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoor, int rechtsAchter) 
+//{
+//  rightSensorValue = digitalRead (sensor);
+//  leftSensorValue = digitalRead (sensor2);
+//  if (!(rightSensorValue) && !(leftSensorValue))
+//  {
+//    analogWrite(linksVoor, 160);
+//    analogWrite(rechtsVoor, 163);
+//    analogWrite(linksAchter, LOW);
+//    analogWrite(rechtsAchter, LOW);
+//  }
+//  else if (rightSensorValue && !(leftSensorValue))
+//  {
+//    analogWrite(linksVoor, LOW);
+//    analogWrite(rechtsVoor, LOW);
+//    analogWrite(linksAchter, 148);
+//    analogWrite(rechtsAchter, LOW);
+//  }
+//  else if (!(rightSensorValue) && leftSensorValue)
+//  {
+//    analogWrite(linksVoor, LOW);
+//    analogWrite(rechtsVoor, LOW);
+//    analogWrite(linksAchter, LOW);
+//    analogWrite(rechtsAchter, 143);
+//  }
+//  else 
+//  {
+//    analogWrite(linksVoor, LOW);
+//    analogWrite(rechtsVoor, LOW);
+//    analogWrite(linksAchter, 148);
+//    analogWrite(rechtsAchter, 143);
+//  }
+//}
+
 void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoor, int rechtsAchter) 
 {
   rightSensorValue = digitalRead (sensor);
   leftSensorValue = digitalRead (sensor2);
   if (!(rightSensorValue) && !(leftSensorValue))
   {
-    analogWrite(linksVoor, 160);
-    analogWrite(rechtsVoor, 163);
-    analogWrite(linksAchter, LOW);
-    analogWrite(rechtsAchter, LOW);
+    analogWrite(linksVoor, LOW);
+    analogWrite(rechtsVoor, LOW);
+    analogWrite(linksAchter, 163);
+    analogWrite(rechtsAchter, 158);
   }
   else if (rightSensorValue && !(leftSensorValue))
   {
     analogWrite(linksVoor, LOW);
     analogWrite(rechtsVoor, LOW);
-    analogWrite(linksAchter, 148);
-    analogWrite(rechtsAchter, LOW);
+    analogWrite(linksAchter, LOW);
+    analogWrite(rechtsAchter, 143);
   }
   else if (!(rightSensorValue) && leftSensorValue)
   {
     analogWrite(linksVoor, LOW);
     analogWrite(rechtsVoor, LOW);
-    analogWrite(linksAchter, LOW);
-    analogWrite(rechtsAchter, 143);
+    analogWrite(linksAchter, 148);
+    analogWrite(rechtsAchter, LOW);
   }
   else 
   {
-    analogWrite(linksVoor, LOW);
-    analogWrite(rechtsVoor, LOW);
-    analogWrite(linksAchter, 148);
-    analogWrite(rechtsAchter, 143);
+    analogWrite(linksVoor, 160);
+    analogWrite(rechtsVoor, 163);
+    analogWrite(linksAchter, LOW);
+    analogWrite(rechtsAchter, LOW);
   }
 }
 
