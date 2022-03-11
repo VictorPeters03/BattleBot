@@ -2,6 +2,12 @@
 #include <analogWrite.h>
 #include <MPU9250.h>
 #include <Adafruit_VL53L0X.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 32 // OLED display height, in pixels
 
 // Motor
 int rechtsVoor = 17; //Dit is linksachter bij de tweede driveOverTape functie
@@ -19,24 +25,36 @@ int leftSensorValue = 0;
 //adafruit vl53l0x
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
+//Adafruit SSD1306
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
 void driveForwardStraight(int rechtsVoor, int linksVoor, int rechtsAchter, int linksAchter) 
 {
   analogWrite(rechtsVoor, LOW);
   analogWrite(linksVoor, LOW);
   analogWrite(rechtsAchter, 187);
-  analogWrite(linksAchter, 193); 
+  analogWrite(linksAchter, 196); 
 }
 
 void showTapeOutput(int sensor, int sensor2)
 {
-  rightSensorValue = digitalRead (sensor);
-  leftSensorValue = digitalRead (sensor2);
-  Serial.print ("Right sensor: ");
-  Serial.print (rightSensorValue, DEC);
-  Serial.println("");
-  Serial.print ("Left sensor: ");
-  Serial.print (rightSensorValue, DEC);
-  Serial.println("");
+  display.begin(SSD1306_SWITCHCAPVCC, 0X3C);
+  display.clearDisplay();
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 10);
+  rightSensorValue = analogRead (sensor);
+  leftSensorValue = analogRead (sensor2);
+  display.print ("Right sensor: ");
+  display.print (rightSensorValue);
+  display.println("");
+  display.print ("Left sensor: ");
+  display.print (leftSensorValue);
+  display.println("");
+  display.display();
+  delay(1000);
+  display.clearDisplay();
 }
 
 
@@ -112,30 +130,30 @@ void showTapeOutput(int sensor, int sensor2)
 
 void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoor, int rechtsAchter) 
 {
-  rightSensorValue = digitalRead (sensor);
-  leftSensorValue = digitalRead (sensor2);
-  if (!(rightSensorValue) && !(leftSensorValue))
+  rightSensorValue = analogRead (sensor);
+  leftSensorValue = analogRead (sensor2);
+  if (rightSensorValue < 500 && leftSensorValue < 500)
   {
     analogWrite(linksVoor, LOW);
     analogWrite(rechtsVoor, LOW);
-    analogWrite(linksAchter, 138);
-    analogWrite(rechtsAchter, 133);
+    analogWrite(linksAchter, 196);
+    analogWrite(rechtsAchter, 187);
   }
-  else if (rightSensorValue && !(leftSensorValue))
+  else if (rightSensorValue > 1000 && leftSensorValue < 500)
   {
     analogWrite(linksVoor, LOW);
-    analogWrite(rechtsVoor, LOW);
-    analogWrite(linksAchter, 178);
+    analogWrite(rechtsVoor, 153);
+    analogWrite(linksAchter, 176);
     analogWrite(rechtsAchter, LOW);
   }
-  else if (!(rightSensorValue) && leftSensorValue)
+  else if (rightSensorValue < 500 && leftSensorValue > 1000)
   {
-    analogWrite(linksVoor, LOW);
+    analogWrite(linksVoor, 150);
     analogWrite(rechtsVoor, LOW);
     analogWrite(linksAchter, LOW);
-    analogWrite(rechtsAchter, 173);
+    analogWrite(rechtsAchter, 177);
   }
-  else 
+  else if (rightSensorValue > 1000 && leftSensorValue > 1000) 
   {
     analogWrite(linksVoor, 160);
     analogWrite(rechtsVoor, 163);
@@ -180,6 +198,13 @@ void setup() {
   {
     delay(1);
   }
+
+  display.begin(SSD1306_SWITCHCAPVCC, 0X3C);
+  display.display();
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 10);
 
   //check if VL53L0X starts up
   if (!lox.begin())
