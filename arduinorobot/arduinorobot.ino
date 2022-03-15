@@ -128,54 +128,77 @@ void showTapeOutput(int sensor, int sensor2)
 //  }
 //}
 
+void drive(int linksVoorSnelheid, int rechtsVoorSnelheid, int linksAchterSnelheid, int rechtsAchterSnelheid)
+{
+  analogWrite(linksVoor, linksVoorSnelheid);
+  analogWrite(rechtsVoor, rechtsVoorSnelheid);
+  analogWrite(linksAchter, linksAchterSnelheid);
+  analogWrite(rechtsAchter, rechtsAchterSnelheid);
+}
+
 void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoor, int rechtsAchter) 
 {
   rightSensorValue = analogRead (sensor);
   leftSensorValue = analogRead (sensor2);
   if (rightSensorValue < 500 && leftSensorValue < 500)
   {
-    analogWrite(linksVoor, LOW);
-    analogWrite(rechtsVoor, LOW);
-    analogWrite(linksAchter, 196);
-    analogWrite(rechtsAchter, 187);
+    drive(LOW, LOW, 176, 167);
   }
-  else if (rightSensorValue > 1000 && leftSensorValue < 500)
+  else if (rightSensorValue > 1500 && leftSensorValue < 500)
   {
-    analogWrite(linksVoor, LOW);
-    analogWrite(rechtsVoor, 153);
-    analogWrite(linksAchter, 176);
-    analogWrite(rechtsAchter, LOW);
+    drive(LOW, 193, 196, LOW);
   }
-  else if (rightSensorValue < 500 && leftSensorValue > 1000)
+  else if (rightSensorValue < 500 && leftSensorValue > 1500)
   {
-    analogWrite(linksVoor, 150);
-    analogWrite(rechtsVoor, LOW);
-    analogWrite(linksAchter, LOW);
-    analogWrite(rechtsAchter, 177);
+    drive(190, LOW, LOW, 197);
   }
-  else if (rightSensorValue > 1000 && leftSensorValue > 1000) 
+  else if (rightSensorValue > 1500 && leftSensorValue > 1500) 
   {
-    analogWrite(linksVoor, 160);
-    analogWrite(rechtsVoor, 163);
-    analogWrite(linksAchter, LOW);
-    analogWrite(rechtsAchter, LOW);
+    drive(160, 163, LOW, LOW);
+  }
+}
+
+void maze(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoor, int rechtsAchter)
+{
+  rightSensorValue = analogRead (sensor);
+  leftSensorValue = analogRead (sensor2);
+  if (rightSensorValue < 500 && leftSensorValue < 500)
+  {
+    drive(LOW, LOW, 206, 197);
+  }
+  else if (rightSensorValue > 1500 && leftSensorValue < 500)
+  {
+    drive(LOW, LOW, 206, 157);
+  }
+  else if (rightSensorValue < 500 && leftSensorValue > 1500)
+  {
+    drive(LOW, LOW, 166, 197);
+  }
+  else if (rightSensorValue > 1500 && leftSensorValue > 1500) 
+  {
+    drive(160, 163, LOW, LOW);
   }
 }
 
 //Deze functie meet de afstand tussen de afstandsensor en een object.
-uint16_t measureDistance()
+void displayDistance()
 {
   VL53L0X_RangingMeasurementData_t measureDistance;
 
-  if (measureDistance.RangeStatus != 4) 
-  {
-    return measureDistance.RangeMilliMeter;
-  } 
-  else 
-  {
-    Serial.println(" out of range ");
+  display.begin(SSD1306_SWITCHCAPVCC, 0X3C);
+  display.clearDisplay();
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 10);
+  if (measureDistance.RangeStatus != 4) {
+    display.print ("distance: ");
+    display.print (measureDistance.RangeMilliMeter);
+    display.println("");
   }
-  delay(100);
+  display.display();
+  delay(1000);
+  display.clearDisplay();
 }
 
 void setup() {
@@ -223,7 +246,8 @@ void loop() {
     isStarted = 1;
   }
 //  showTapeOutput(rightSensor, leftSensor);
-  driveOverTape(rightSensor, leftSensor, rechtsVoor, linksAchter, linksVoor, rechtsAchter);
+//  driveOverTape(rightSensor, leftSensor, rechtsVoor, linksAchter, linksVoor, rechtsAchter);
+  maze(rightSensor, leftSensor, rechtsVoor, linksAchter, linksVoor, rechtsAchter);
 //  delay(1000);
 //  driveForwardStraight(rechtsVoor, linksVoor, rechtsAchter, linksAchter);
 }
