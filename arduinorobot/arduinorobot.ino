@@ -20,7 +20,9 @@ int isStarted = 0; //Deze gaat op 1 wanneer de robot 1 seconde lang gestart is
 int rightSensor = 39; //Dit is de linkersensor bij driveOverTape 2 en 3 
 int leftSensor = 34; //Dit is de rechtersensor bij driveOverTape 2 en 3
 int rightSensorValue = 0;
-int leftSensorValue = 0; 
+int leftSensorValue = 0;
+
+int engineSpeed = 170;
 
 //adafruit vl53l0x
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
@@ -136,6 +138,21 @@ void drive(int linksVoorSnelheid, int rechtsVoorSnelheid, int linksAchterSnelhei
   analogWrite(rechtsAchter, rechtsAchterSnelheid);
 }
 
+void brake(int rightSensorValue, int leftSensorValue)
+{
+  while(engineSpeed > 0)
+  {
+    engineSpeed -= 50;
+  }
+  while(rightSensorValue < 80 && leftSensorValue < 80)
+  {
+    analogWrite(forwardLeft, LOW);
+    analogWrite(forwardRight, LOW);
+    analogWrite(reverseLeft, 170);
+    analogWrite(reverseRight, 170);
+  }
+}
+
 void driveOverTape(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoor, int rechtsAchter) 
 {
   rightSensorValue = analogRead (sensor);
@@ -162,22 +179,26 @@ void maze(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoo
 {
   rightSensorValue = analogRead (sensor);
   leftSensorValue = analogRead (sensor2);
-  if (rightSensorValue < 500 && leftSensorValue < 500)
+  if (rightSensorValue < 80 && leftSensorValue < 80)
   {
     drive(LOW, LOW, 206, 197);
   }
-  else if (rightSensorValue > 1500 && leftSensorValue < 500)
+  else if (rightSensorValue > 90 && leftSensorValue > 90)
   {
-    drive(LOW, LOW, 206, 157);
+    brake();
   }
-  else if (rightSensorValue < 500 && leftSensorValue > 1500)
-  {
-    drive(LOW, LOW, 166, 197);
-  }
-  else if (rightSensorValue > 1500 && leftSensorValue > 1500) 
-  {
-    drive(160, 163, LOW, LOW);
-  }
+//  else if (rightSensorValue > 1500 && leftSensorValue < 500)
+//  {
+//    drive(LOW, LOW, 206, 157);
+//  }
+//  else if (rightSensorValue < 500 && leftSensorValue > 1500)
+//  {
+//    drive(LOW, LOW, 166, 197);
+//  }
+//  else if (rightSensorValue > 1500 && leftSensorValue > 1500) 
+//  {
+//    drive(160, 163, LOW, LOW);
+//  }
 }
 
 //Deze functie meet de afstand tussen de afstandsensor en een object.
