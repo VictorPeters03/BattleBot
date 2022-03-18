@@ -45,21 +45,34 @@ void drive(int linksVoorSnelheid, int rechtsVoorSnelheid, int linksAchterSnelhei
   analogWrite(rechtsAchter, rechtsAchterSnelheid);
 }
 
-void showTapeOutput(int sensor, int sensor2, int directionMode)
+void showOutput(int sensor, int sensor2, int directionMode)
 {
   rightSensorValue = analogRead (sensor);
   leftSensorValue = analogRead (sensor2);
-
+  display.clearDisplay();
+  
   display.setTextSize(1);
   display.setTextColor(WHITE);
+  display.setCursor(0,0);
   display.print ("LR sensors: ");
   display.print (leftSensorValue);
   display.print("/");
   display.print(rightSensorValue);
   display.println("");
   display.print ("Mode: ");
-  display.print (directionMode);
+  if(directionMode == 1){
+      display.print ("vooruit (1)");
+  } else if(directionMode == 2){
+      display.print ("rechts (2)");
+  } else if(directionMode == 3){
+      display.print ("links (3)");
+  } else if(directionMode == 4){
+      display.print ("achteruit (4)");
+  }
+  display.println("");
+  display.print("INF1C Robot");
   display.display();
+  delay(100);
 
   //display.clearDisplay();
 }
@@ -75,28 +88,33 @@ void race(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoo
   rightSensorValue = analogRead (sensor);
   leftSensorValue = analogRead (sensor2);
   //Vooruit??
-  if (rightSensorValue > 50 && leftSensorValue > 50)
+  if (rightSensorValue > 120 && leftSensorValue > 120)
   {
-    showTapeOutput(sensor, sensor2, 1);
+    showOutput(sensor, sensor2, 1);
     //drive(LOW, LOW, 176, 167);
+    drive(190, 190, LOW, LOW);
   }
   //Rechts?
-  else if (rightSensorValue < 2500 && leftSensorValue > 50)
+  else if (rightSensorValue < 120 && leftSensorValue > 120)
   {
-    showTapeOutput(sensor, sensor2, 2);
-   // drive(LOW, 193, 196, LOW);
+    showOutput(sensor, sensor2, 2);
+    
+    //drive(LOW, 193, 196, LOW);
+    drive(LOW, 190, LOW, LOW);
   }
   //Links
-  else if (rightSensorValue > 50 && leftSensorValue > 2500)
+  else if (rightSensorValue > 120 && leftSensorValue > 120)
   {
-    showTapeOutput(sensor, sensor2, 3);
+    showOutput(sensor, sensor2, 3);
     //drive(190, LOW, LOW, 197);
+    drive(190, LOW, LOW, LOW);
   }
   //Achteruit??
-  else if (rightSensorValue < 2500 && leftSensorValue < 2500) 
+  else if (rightSensorValue < 120 && leftSensorValue < 120) 
   {
-    showTapeOutput(sensor, sensor2, 4);
-  //  drive(160, 163, LOW, LOW);
+    showOutput(sensor, sensor2, 4);
+     //drive(160, 163, LOW, LOW);
+    drive(LOW, LOW, 190, 190);
   }
 }
 
@@ -121,11 +139,8 @@ void setup() {
     delay(1);
   }
 
-   display.begin(SSD1306_SWITCHCAPVCC, 0X3C);
-  display.setCursor(0, 10);
+  display.begin(SSD1306_SWITCHCAPVCC, 0X3C);
   display.display();
-
-
 
   //check if VL53L0X starts up
   if (!lox.begin())
@@ -134,7 +149,8 @@ void setup() {
     while(1);
   }
   delay(2000);
-   display.clearDisplay();
+  display.clearDisplay();
+  display.display();
 }
 
 void loop() {
