@@ -66,66 +66,32 @@ void butler()
   uint16_t distances[2];  
   VL53L0X_RangingMeasurementData_t measureDistance;
   lidar.rangingTest(&measureDistance, false);
-//  drive(163, LOW, 167, LOW);
-//  if (measureDistance.RangeMilliMeter <= 100)
-//  {
-//    drive(0, 0, 0, 0);
-//    delay(500);
-//    for(uint32_t tStart = millis(); (millis()-tStart) < duration;)
-//    {
-//      drive(163, LOW, LOW, 166);
-//    }
-//    distances[0] = measureDistance.RangeMilliMeter;
-//    for(uint32_t tStart = millis(); (millis()-tStart) < duration * 2;)
-//    {
-//      drive(LOW, 160, 167, LOW);
-//    }
-//    distances[1] = measureDistance.RangeMilliMeter;
-//
-//    if (distances[0] > distances[1])
-//    {
-//      for(uint32_t tStart = millis(); (millis()-tStart) < duration * 2;)
-//      {
-//        drive(163, LOW, LOW, 166);
-//      }
-//    }
-//  }
   drive(160, LOW, 167, LOW);
   if (measureDistance.RangeMilliMeter <= 200)
   {
-//    displayDistance();
     drive(0, 0, 0, 0);
     distances[0] = distance();
-    for(uint32_t tStart = millis(); (millis()-tStart) < duration;)
+    while(millis() < duration || abs(distances[0] - distances[1]) >= 500)
     {
       drive(163, LOW, LOW, 166);
       distances[1] = distance();
-      if (abs(distances[0] - distances[1]) >= 500)
-      {
-        while(abs(distances[0] - distances[1]) < 500)
-        {
-          drive(163, LOW, LOW, 166);
-          distances[1] = distance();
-          distances[0] = distances[1];
-        }
-      }
-      else 
-      {
-        distances[0] = distances[1];
-      }
+      distances[0] = distances[1];
     }
-    distances[0] = distance();
-    for(uint32_t tStart = millis(); (millis()-tStart) < duration * 2;)
+    if (abs(distances[0] - distances[1]) >= 500) 
     {
-      drive(LOW, 160, 167, LOW);
-    }
-    distances[1] = distance();
-
-    if (distances[0] > distances[1])
-    {
-      for(uint32_t tStart = millis(); (millis()-tStart) < duration * 2;)
+      while (abs(distances[0] - distances[1]) < 500)
       {
         drive(163, LOW, LOW, 166);
+        distances[1] = distance();
+        distances[0] = distances[1];
+      }
+      while (distance() >= 50)
+      {
+        drive(160, LOW, 167, LOW);
+      }
+      for (uint32_t tStart = millis(); (millis()-tStart) < duration;)
+      {
+        drive(LOW, 160, 167, LOW);
       }
     }
   }
@@ -133,29 +99,10 @@ void butler()
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(115200);
-  pinMode(rightWheelForward, OUTPUT);
-  pinMode(rightWheelBackward, OUTPUT);
-  pinMode(leftWheelForward, OUTPUT);
-  pinMode(leftWheelBackward, OUTPUT);
-  drive(0, 0, 0, 0);
 
-  //check if VL53L0X starts up
-  if (!lidar.begin())
-  {
-    Serial.println(F("Failed to boot VL53L0X"));
-    while(1);
-  }
-  delay(2000);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if (!isStarted)
-  {
-    drive(183, LOW, 187, LOW);
-    delay(1000);
-    isStarted = 1;
-  }
-  butler();
+
 }
