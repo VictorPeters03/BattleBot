@@ -17,7 +17,7 @@ int leftWheelForward = 5;
 int leftWheelBackward = 18;
 
 //Turn duration
-uint32_t duration = 800;
+uint32_t duration = 2000;
 
 //Instantiate Lidar object.
 Adafruit_VL53L0X lidar = Adafruit_VL53L0X();
@@ -64,24 +64,32 @@ void displayDistance()
 void butler()
 {
   uint16_t distances[2];  
-  VL53L0X_RangingMeasurementData_t measureDistance;
-  lidar.rangingTest(&measureDistance, false);
   drive(160, LOW, 167, LOW);
-  if (measureDistance.RangeMilliMeter <= 200)
+  if (distance() <= 200)
   {
     drive(0, 0, 0, 0);
+    uint32_t starttime = millis();
+    uint32_t endtime = starttime;
     distances[0] = distance();
-    while(millis() < duration || abs(distances[0] - distances[1]) >= 500)
+    while((endtime - starttime) < duration && abs(distances[0] - distances[1]) <= 50)
     {
-      drive(163, LOW, LOW, 166);
-      distances[1] = distance();
+      drive(153, LOW, LOW, 156);
       distances[0] = distances[1];
+      distances[1] = distance();
+      endtime = millis();
+//      Serial.print("first distance: ");
+//      Serial.print(distances[0]);
+//      Serial.println("");
+//      Serial.print("second distance: ");
+//      Serial.print(distances[1]);
+//      Serial.println("");
     }
-    if (abs(distances[0] - distances[1]) >= 500) 
+    if (abs(distances[0] - distances[1]) >= 50) 
     {
-      while (abs(distances[0] - distances[1]) < 500)
+//      Serial.println("yes");
+      while (abs(distances[0] - distances[1]) < 50)
       {
-        drive(163, LOW, LOW, 166);
+        drive(153, LOW, LOW, 156);
         distances[1] = distance();
         distances[0] = distances[1];
       }
@@ -89,20 +97,41 @@ void butler()
       {
         drive(160, LOW, 167, LOW);
       }
-      for (uint32_t tStart = millis(); (millis()-tStart) < duration;)
-      {
-        drive(LOW, 160, 167, LOW);
-      }
+      
+//      for (uint32_t tStart = millis(); (millis()-tStart) < duration;)
+//      {
+//        drive(160, LOW, 167, LOW);
+//      }
     }
   }
 }
 
 void setup() {
   // put your setup code here, to run once:
+  Serial.begin(115200);
+  pinMode(rightWheelForward, OUTPUT);
+  pinMode(rightWheelBackward, OUTPUT);
+  pinMode(leftWheelForward, OUTPUT);
+  pinMode(leftWheelBackward, OUTPUT);
+  drive(0, 0, 0, 0);
 
+  //check if VL53L0X starts up
+  if (!lidar.begin())
+  {
+    Serial.println(F("Failed to boot VL53L0X"));
+    while(1);
+  }
+  delay(2000);
 }
+
 
 void loop() {
   // put your main code here, to run repeatedly:
-
+  if (!isStarted)
+  {
+    drive(183, LOW, 187, LOW);
+    delay(1000);
+    isStarted = 1;
+  }
+  butler();
 }
