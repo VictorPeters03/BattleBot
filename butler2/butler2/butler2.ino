@@ -16,8 +16,15 @@ int rightWheelBackward = 16;
 int leftWheelForward = 5;
 int leftWheelBackward = 18;
 
+uint16_t distances[3]; 
+uint32_t starttime = millis();
+uint32_t endtime = starttime;
+
 //Turn duration
 uint32_t duration = 2000;
+
+//Adafruit SSD1306 (display)
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 //Instantiate Lidar object.
 Adafruit_VL53L0X lidar = Adafruit_VL53L0X();
@@ -30,6 +37,37 @@ void drive(int rightForwardSpeed, int rightBackwardSpeed, int leftForwardSpeed, 
   analogWrite(leftWheelBackward, leftBackwardSpeed);
 }
 
+void printData(uint16_t distances[], uint32_t starttime, uint32_t endtime, boolean yes)
+{
+  //rightSensorValue = analogRead (rightSensorValue);
+  //leftSensorValue = analogRead (leftSensorValue);
+  display.clearDisplay();
+  
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0,0);
+  display.print ("D: 0:");
+  display.print (distances[0]);
+  display.print (", 1: ");
+  display.print (distances[1]);
+  display.println("");
+  display.print ("2: ");
+  display.print (distances[2]);
+  if(yes){
+    display.print (" - YES!!");
+  }
+
+  display.println("");
+  //display.print("INF1C Robot");
+  display.print("Time: ");
+  display.print(starttime);
+  display.print(" - ");
+  display.print(endtime);
+  display.display();
+  
+  //display.clearDisplay();
+}
+
 uint16_t distance()
 {
   VL53L0X_RangingMeasurementData_t measureDistance;
@@ -39,21 +77,31 @@ uint16_t distance()
 
 void butler() 
 {
-  uint16_t distances[2];  
+  uint16_t debugDistances[2];
+  debugDistances[0] = distances[0];
+  debugDistances[1] = distances[1];
+  debugDistances[2] = distance();
+  printData(debugDistances, starttime, endtime, false);
+      
   drive(160, LOW, 167, LOW);
   if (distance() <= 500)
   {
     drive(0, 0, 0, 0);
-    uint32_t starttime = millis();
-    uint32_t endtime = starttime;
+    starttime = millis();
+    endtime = starttime;
     distances[0] = distance();
     distances[1] = distance();
+    //For debug.
+    distances[2] = distance();
+    printData(distances, starttime, endtime, false);
     while((endtime - starttime) < duration)
     {
       drive(163, LOW, LOW, 166);
       distances[0] = distances[1];
       distances[1] = distance();
+      distances[2] = distance();
       endtime = millis();
+      printData(distances, starttime, endtime, false);
       Serial.print("first distance: ");
       Serial.print(distances[0]);
       Serial.println("");
@@ -62,6 +110,7 @@ void butler()
       Serial.println("");
       if (distances[0] - distances[1] > 25)
       {
+        printData(distances, starttime, endtime, true);
         Serial.println("yes");
         for (uint32_t tStart = millis(); (millis()-tStart) < duration;)
         {
@@ -70,7 +119,10 @@ void butler()
       }
     while(distances[0] - distances[1] > 0 && distances[0] - distances[1] <= 30)
     {
-      
+      debugDistances[0] = distances[0];
+      debugDistances[1] = distances[1];
+      debugDistances[2] = distance();
+      printData(debugDistances, starttime, endtime, false);
     }
     }
   }
@@ -91,7 +143,12 @@ void setup() {
     Serial.println(F("Failed to boot VL53L0X"));
     while(1);
   }
+  display.begin(SSD1306_SWITCHCAPVCC, 0X3C);
+  display.display();
+  
   delay(2000);
+  display.clearDisplay();
+  display.display();
 }
 
 void loop() {
