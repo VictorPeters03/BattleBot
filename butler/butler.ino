@@ -180,10 +180,7 @@ void setup() {
     Serial.println(F("Failed to boot VL53L0X"));
     while(1);
   }
-  for (uint32_t tStart = millis(); (millis()-tStart) < 2000;)
-  {
-    
-  }
+  for (uint32_t tStart = millis(); (millis()-tStart) < 2000;);
 }
 
 void loop() {
