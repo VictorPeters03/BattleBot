@@ -184,7 +184,9 @@ void setup() {
 }
 
 void loop() {
-  //The following if statement 
+  /*The following if statement will start the motors for 400 milliseconds at the beginning of each program.
+   *This statement will be ran once.
+   */
   if (!isStarted)
   {
     for (uint32_t tStart = millis(); (millis()-tStart) < 400;)
