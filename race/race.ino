@@ -9,6 +9,10 @@
 #define SCREEN_HEIGHT 32 // OLED display height, in pixels
 
 // Motor
+//int rechtsVoor = 17; //Dit is linksachter bij de tweede driveOverTape functie
+//int linksAchter = 5; //Dit is rechtsvoor bij de tweede driveOverTape functie
+//int linksVoor = 18; //Dit is rechtsachter bij de tweede driveOverTape functie
+//int rechtsAchter = 16; //Dit is linksvoor bij de tweede driveOverTape functie
 int rechtsVoor = 17; //Dit is linksachter bij de tweede driveOverTape functie
 int linksAchter = 18; //Dit is rechtsvoor bij de tweede driveOverTape functie
 int linksVoor = 5; //Dit is rechtsachter bij de tweede driveOverTape functie
@@ -63,14 +67,14 @@ void moveForward(){
     printData(1);
     analogWrite(linksVoor, LOW);
     analogWrite(rechtsVoor, LOW);
-    analogWrite(linksAchter, 222);
+    analogWrite(linksAchter, 220);
     analogWrite(rechtsAchter, 225);
 }
 
 void moveBackwards(){
     printData(4);
      //drive(160, 163, LOW, LOW);
-    analogWrite(linksVoor, 222);
+    analogWrite(linksVoor, 225);
     analogWrite(rechtsVoor, 225);
     analogWrite(linksAchter, LOW);
     analogWrite(rechtsAchter, LOW);
@@ -80,18 +84,18 @@ void moveLeft(){
     printData(3);
     //drive(LOW, 193, 196, LOW);
     analogWrite(linksVoor, LOW);
-    analogWrite(rechtsVoor, 225);
-    analogWrite(linksAchter, 225);
+    analogWrite(rechtsVoor, 200);
+    analogWrite(linksAchter, 200);
     analogWrite(rechtsAchter, LOW);
 }
 
 void moveRight(){
     printData(2);
     //drive(190, LOW, LOW, 197);
-    analogWrite(linksVoor, 225);
+    analogWrite(linksVoor, 200);
     analogWrite(rechtsVoor, LOW);
     analogWrite(linksAchter, LOW);
-    analogWrite(rechtsAchter, 225);
+    analogWrite(rechtsAchter, 200);
 }
 
 void stopMove(){
@@ -100,6 +104,14 @@ void stopMove(){
     analogWrite(rechtsVoor, LOW);
     analogWrite(linksAchter, LOW);
     analogWrite(rechtsAchter, LOW);
+}
+
+void nonBlockingDelay(int delayPeriod){
+  unsigned long time_now = millis();
+   
+  while(millis() < time_now + delayPeriod){
+     continue;
+   }
 }
 
 void race(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoor, int rechtsAchter) 
@@ -111,11 +123,12 @@ void race(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoo
     if(!paused){
        stopMove();
        paused = true;
-       delay(1000);
+       //delay(1000);
+       nonBlockingDelay(1000);
        return;
     } else {
       paused = false;
-      delay(1000);
+      nonBlockingDelay(1000);
     }
   }
   else if(paused){
@@ -127,33 +140,34 @@ void race(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoo
 
   //Wit is laag
   //If both sensors don't see the line.
-  if (rightSensorValue < 1000 && leftSensorValue < 1000)
+  if (rightSensorValue < 120 && leftSensorValue < 120)
   {
     moveForward();
   }
   //Rechts?
   //If the right sensor sees the line.
-  else if (rightSensorValue > 1000 && leftSensorValue < 1000)
+  else if (rightSensorValue > 120 && leftSensorValue < 120)
   {
     stopMove();
     delay(100);
     moveRight();
-    delay(100);
+    //delay(100);
   }
   //Links
   //If the left sensor sees the line
-  else if (rightSensorValue < 1000 && leftSensorValue > 1000)
+  else if (rightSensorValue < 120 && leftSensorValue > 120)
   {
     stopMove();
     delay(100);
     moveLeft();
-    delay(100);
+    //delay(100);
   }
   //Achteruit??
   //If both sensors see the line.
-  else if (rightSensorValue > 1000 && leftSensorValue > 1000)
+  else if (rightSensorValue > 120 && leftSensorValue > 120)
   {
     moveBackwards();
+    delay(50);
   }
 }
 
