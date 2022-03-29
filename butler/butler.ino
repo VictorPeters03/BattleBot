@@ -80,8 +80,8 @@ void butler()
   //Drive until distance between lidar and object is smaller than 30 cm.
   uint16_t distances[2];
   bool breakNextLoop = false;  
-  drive(160, LOW, 167, LOW);
-  if (distance() <= 300)
+  drive(160, LOW, 165, LOW);
+  if (distance() <= 450)
   {
     //Stand still and store the measured distance in distance[0] and distance[1].
     drive(0, 0, 0, 0);
@@ -93,31 +93,40 @@ void butler()
     while ((endtime - starttime) < duration)
     {
       //Look left and constantly update the lidar's measured values, while storing the previously measured value in distance[0] for comparison.
-      drive(160, LOW, LOW, 163);
+      drive(170, LOW, LOW, 173);
       distances[0] = distances[1];
       distances[1] = distance();
       endtime = millis();
       //If there is a large difference in the last and previously measured distance, the lidar has found the first part of the opening.
-      if (abs(distances[0] - distances[1]) >= 35)
+      if (abs(distances[0] - distances[1]) >= 70)
       {
         //The variable "breakNextLoop" ensures that the robot wont look right after having found the opening.
         breakNextLoop = true;
         //Turn left for a bit longer so that the robot will not crash into the first part of the gate.
-        for (uint32_t tStart = millis(); (millis()-tStart) < 100;)
+        for (uint32_t tStart = millis(); (millis()-tStart) < 230;)
         {
           drive (163, LOW, LOW, 166);
+
         }
         drive(0, 0, 0, 0);
         //Drive towards the gate until the robot is 3 cm's or less from the wall.
-        while (distance() > 300)
+        while (distance() > 230)
         {
           drive(160, LOW, 167, LOW);
         }
         drive(0, 0, 0, 0);
         //Turn right until the robot is able to go through the opening.
-        while (distance() < 430)
+        distances[0] = distance();
+        distances[1] = distance();
+        while (distance() < 550)
         {
           drive(LOW, 160, 167, LOW);
+          distances[0] = distances[1];
+          distances[1] = distance();
+        }
+        for (uint32_t tStart = millis(); (millis()-tStart) < 50;)
+        {
+          drive (LOW, 160, 167, LOW);
         }
         drive(0, 0, 0, 0);
         break;
@@ -126,7 +135,7 @@ void butler()
     starttime = millis();
     endtime = starttime;
     //This loop will be fully executed if the difference in distances was not detected in the first loop, thus meaning that the opening is on the right.
-    while ((endtime - starttime) < (duration * 2))
+    while ((endtime - starttime) < duration * 2)
     {
       //The loop will not execute is "breakNextLoop" is true.
       if (breakNextLoop)
@@ -134,29 +143,38 @@ void butler()
         break;
       }
       //Look right and constantly update the lidar's measured values, while storing the previously measured value in distance[0] for comparison.
-      drive(LOW, 160, 167, LOW);
+      drive(LOW, 170, 177, LOW);
       distances[0] = distances[1];
       distances[1] = distance();
       endtime = millis();
       //If there is a large difference in the last and previously measured distance, the lidar has found the first part of the opening.
-      if (abs(distances[0] - distances[1]) >= 35)
+      if (abs(distances[0] - distances[1]) >= 70)
       {
         //Turn right for a bit longer so that the robot will not crash into the first part of the gate.
-        for (uint32_t tStart = millis(); (millis()-tStart) < 100;)
+        for (uint32_t tStart = millis(); (millis()-tStart) < 230;)
         {
           drive (LOW, 160, 167, LOW);
         }
         drive(0, 0, 0, 0);
         //Drive towards the gate until the robot is 3 cm's or less from the wall.
-        while (distance() > 300)
+        while (distance() > 230)
         {
           drive(160, LOW, 167, LOW);
         }
         drive(0, 0, 0, 0);
         //Turn left until the robot is able to go through the opening.
-        while (distance() < 430)
+        distances[0] = distance();
+        distances[1] = distance();
+        while (distance() < 550)
         {
           drive(163, LOW, LOW, 166);
+          distances[0] = distances[1];
+          distances[1] = distance();
+        }
+        drive(0, 0, 0, 0);
+        for (uint32_t tStart = millis(); (millis()-tStart) < 50;)
+        {
+          drive (163, LOW, LOW, 166);
         }
         drive(0, 0, 0, 0);
         break;
