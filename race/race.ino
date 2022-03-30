@@ -140,7 +140,12 @@ void race(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoo
 
   //Wit is laag
   //If both sensors don't see the line.
-  if (rightSensorValue < 120 && leftSensorValue < 120)
+  if (rightSensorValue < 40 && leftSensorValue < 40)
+  {
+    stopMove();
+    //TODO: Finish code!
+  }
+  else if (rightSensorValue < 120 && leftSensorValue < 120)
   {
     moveForward();
   }
@@ -149,7 +154,8 @@ void race(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoo
   else if (rightSensorValue > 120 && leftSensorValue < 120)
   {
     stopMove();
-    delay(100);
+    //delay(100);
+    nonBlockingDelay(100);
     moveRight();
     //delay(100);
   }
@@ -158,7 +164,8 @@ void race(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoo
   else if (rightSensorValue < 120 && leftSensorValue > 120)
   {
     stopMove();
-    delay(100);
+    //delay(100);
+    nonBlockingDelay(100);
     moveLeft();
     //delay(100);
   }
@@ -167,7 +174,8 @@ void race(int sensor, int sensor2, int rechtsVoor, int linksAchter, int linksVoo
   else if (rightSensorValue > 120 && leftSensorValue > 120)
   {
     moveBackwards();
-    delay(50);
+    //delay(50);
+    nonBlockingDelay(50);
   }
 }
 
