@@ -17,7 +17,7 @@ int leftWheelForward = 5;
 int leftWheelBackward = 18;
 
 //Turn duration
-uint32_t duration = 600;
+uint32_t duration = 400;
 
 //Adafruit SSD1306 (display)
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
@@ -103,7 +103,7 @@ void butler()
         //The variable "breakNextLoop" ensures that the robot wont look right after having found the opening.
         breakNextLoop = true;
         //Turn left for a bit longer so that the robot will not crash into the first part of the gate.
-        for (uint32_t tStart = millis(); (millis()-tStart) < 150;)
+        for (uint32_t tStart = millis(); (millis()-tStart) < 100;)
         {
           drive (173, LOW, LOW, 176);
         }
@@ -153,7 +153,7 @@ void butler()
       if (abs(distances[0] - distances[1]) >= 80)
       {
         //Turn right for a bit longer so that the robot will not crash into the first part of the gate.
-        for (uint32_t tStart = millis(); (millis()-tStart) < 150;)
+        for (uint32_t tStart = millis(); (millis()-tStart) < 100;)
         {
           drive (LOW, 170, 177, LOW);
         }
