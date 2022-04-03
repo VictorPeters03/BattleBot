@@ -22,6 +22,7 @@ int leftFront = 5;
 //Tracks driving and start status.
 boolean isStarted = false;
 boolean isDriving = false;
+boolean mpuIsWorking = false;
 //True if a critical error has occured and stops execution of program.
 boolean stop = false;
 //Used for tracking status and current game/task.
@@ -77,19 +78,24 @@ void setup()
 
     delay(2000);
 
-    if(!mpu.setup(0x68)){
-      currentJob = "Error starting MPU.";
-      logScreen();
-      stop = true;
-      return;
+    if(!mpu.setup(0x68))
+    {
+      Serial.println("Error starting MPU. ");
+      //currentJob = "Error starting MPU.";
+      //logScreen();
+      //stop = true;
+      //return;
     }
-    currentJob = "Calibrating in 5 seconds.";
-    logScreen();
-    delay(5000);
-    currentJob = "Calibrating.";
-    logScreen();
-    mpu.calibrateAccelGyro();
-
+    else
+    {
+      mpuIsWorking = true;
+      currentJob = "Calibrating in 5 seconds.";
+      logScreen();
+      delay(5000);
+      currentJob = "Calibrating.";
+      logScreen();
+      mpu.calibrateAccelGyro();
+    }
     //Start WiFi connection.
     WiFi.begin(SSID, PASSWORD);
 
@@ -315,13 +321,17 @@ void gameCommand(String game, String action)
 void sendStatus()
 {
   float accel = 0;
-    if(mpu.update()){
+  if(mpuIsWorking)
+  {
+    if(mpu.update())
+    {
       accel = mpu.getAccBiasX() * 1000.f / (float)MPU9250::CALIB_ACCEL_SENSITIVITY;
       Serial.print(accel);
+      }
      }
     if (millis() < statusDelay)
     {
-        Serial.println("Delay2");
+        //Serial.println("Delay2");
         return;
     }
 
