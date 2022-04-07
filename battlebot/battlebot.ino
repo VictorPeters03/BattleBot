@@ -157,7 +157,7 @@ void loop()
 }
 
 boolean handleGameLoop(){
-      if (stop)
+    if (stop)
     {
       drive(0, 0, 0, 0);
         Serial.println("Stopped");
@@ -283,7 +283,8 @@ void gameCommand(String game, String action)
         }
         Serial.println("PREPARE!!!");
         status = "preparing_game";
-    } else if (action == "start")
+    } 
+    else if (action == "start")
     {
         if (status == "in_game")
         {
@@ -298,7 +299,8 @@ void gameCommand(String game, String action)
 
         Serial.println("IN_GAME!!!");
         status = "in_game";
-    } else if (action == "ended")
+    } 
+    else if (action == "ended")
     {
         status = "finished";
     }
@@ -306,13 +308,16 @@ void gameCommand(String game, String action)
     if (game == "race")
     {
         handleRaceGame();
-    } else if (game == "butler")
+    } 
+    else if (game == "butler")
     {
         handleButlerGame();
-    } else if (game == "maze")
+    } 
+    else if (game == "maze")
     {
 
-    } else
+    } 
+    else
     {
         webSocket.sendTXT("{\"error\": \"GAME_NOT_FOUND\"}");
     }

@@ -54,73 +54,89 @@ void showTapeOutput()
   display.clearDisplay();
 }
 
-void maze(int rightSensor, int leftSensor)
+void maze()
 {
   rightSensorValue = analogRead (rightSensor);
   leftSensorValue = analogRead (leftSensor);
+  //If both infrared sensors see white, drive forward.
   if (rightSensorValue < 80 && leftSensorValue < 80)
   {
     drive(140, LOW, 146, LOW);
   }
+  //If the right infrared sensor sees grey tape and the left infrared sensor sees white, steer to the right until both sensors see white.
   else if ((rightSensorValue > 80 && rightSensorValue < 1500) && leftSensorValue < 75)
   {
     drive(LOW, 153, 196, LOW);
   }
+  //If the left infrared sensor sees grey tape and the right infrared sensor sees white, steer to the left until both sensors see white.
   else if (rightSensorValue < 75 && (leftSensorValue > 80 && leftSensorValue < 1500))
   {
     drive(190, LOW, LOW, 157);
   }
+  /* If the right infrared sensor sees black tape, first drive forward for 100 milliseconds. 
+   * If the left infrared sensor sees black tape aswell, take a sharp turn left.
+   * If the left infrared sensor does not see black tape, drive forward until the right infrared sensor sees grey tape.
+   * When the right infrared sensor sees grey tape, drive forward for 250 milliseconds. If the right infrared sensor sees black tape after driving, the robot will go forward.
+   * If the robot does not see black tape, the robot will take a sharp turn right.
+   */
   else if (rightSensorValue > 1500) 
   {
-    for (uint32_t tStart = millis(); (millis() - tStart) < 200;)
+    // Drive forward
+    for (uint32_t tStart = millis(); (millis() - tStart) < 100;)
     {
-      drive(140, LOW, 146, LOW);
+      drive(150, LOW, 156, LOW);
     }
-    if (rightSensorValue < 2000)
+    // Take a sharp turn left if the left infrared sensor sees black tape
+    if (leftSensorValue > 1500)
     {
-      for (uint32_t tStart = millis(); (millis() - tStart) < 100;)
+      for (uint32_t tStart = millis(); (millis() - tStart) < 600;)
       {
-        drive(LOW, 193, 196, LOW);
-      }
-      if ()
-
-      for (uint32_t tStart = millis(); (millis() - tStart) < 500;)
-      {
-        drive(LOW, 193, 196, LOW);
+        drive(190, LOW, LOW, 197);
       }
     }
-    
-//    if (rightSensorValue < 2250)
-//    {
-//      for (uint32_t tStart = millis(); (millis() - tStart) < 600;)
-//      {
-//        drive(LOW, 203, 206, LOW);
-//      }
-//        while (leftSensorValue < 50)
-//        {
-//          drive(LOW, 163, 166, LOW);
-//        }
-//        for (uint32_t tStart = millis(); (millis() - tStart) < 400;)
-//        {
-//          drive(LOW, 203, 206, LOW);
-//        }
+    else
+    {
+      // Drive forward while the right infrared sensor does not see grey tape.
+      while (rightSensorValue > 1500)
+      {
+        drive(140, LOW, 146, LOW);
+      }
+      // Drive forward for 250 milliseconds.
+      for (uint32_t tStart = millis(); (millis() - tStart) < 250;)
+      {
+        drive(140, LOW, 146, LOW);
+      }
+      // Go forward if the right infrared sensor sees black tape.
+      if (rightSensorValue > 1500)
+      {
+        drive(140, LOW, 146, LOW);
+      }
+      else 
+      {
+        // Take a sharp turn right if the right sensor does not see black tape.
+        for (uint32_t tStart = millis(); (millis() - tStart) < 500)
+        {
+          drive(LOW, 193, 196, LOW);
+        }
+      }
     }
+  }
+  // If the left sensor detects black tape, drive forward for 500 milliseconds and then take a sharp turn left.
   else if (leftSensorValue > 1500)
   {
     for (uint32_t tStart = millis(); (millis() - tStart) < 500;)
     {
       drive(150, LOW, 156, LOW);
-    }
-//    for (uint32_t tStart = millis(); (millis() - tStart) < 400;)
-//    {
-//      drive(200, LOW, LOW, 207);
-//    }
-//    while (rightSensorValue < 50)
-//    {
-//      drive(160, LOW, LOW, 167);
-//    }
-    
+    }   
     for (uint32_t tStart = millis(); (millis() - tStart) < 600;)
+    {
+      drive(200, LOW, LOW, 207);
+    }
+  }
+  // If the left and the right infrared sensor detect grey tape, turn around.
+  else if ((rightSensorValue > 80 && rightSensorValue < 1500) && (leftSensorValue > 80 && leftSensorValue < 1500))
+  {
+    for (uint32_t tStart = millis(); (millis() - tStart) < 1000;)
     {
       drive(200, LOW, LOW, 207);
     }
@@ -146,6 +162,5 @@ void loop() {
     }
     isStarted = true;
   }
-  maze(rightSensor, leftSensor);
-//showTapeOutput();
+  maze();
 }
