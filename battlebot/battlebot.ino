@@ -37,13 +37,13 @@ const int LEFT_IR_SENSOR = 34;
 int rightIRValue = 0;
 int leftIRValue = 0;
 //Connecting to WiFi.
-//const char *SSID = "battlebot_nl";
-//const char *PASSWORD = "battlebot_nl";
-const char *SSID = "iPhone";
-const char *PASSWORD = "truppy123";
+const char *SSID = "battlebot_nl";
+const char *PASSWORD = "battlebot_nl";
+//const char *SSID = "iPhone";
+//const char *PASSWORD = "truppy123";
 //Network data, Interface group.
-//const char HOST[] = "10.110.111.103";
-const char HOST[] = "172.20.10.6";
+const char HOST[] = "10.110.111.103";
+//const char HOST[] = "172.20.10.6";
 const char PATH[] = "/";
 const int PORT = 3003;
 //Screen resolution.

@@ -60,27 +60,33 @@ void maze(int rightSensor, int leftSensor)
   leftSensorValue = analogRead (leftSensor);
   if (rightSensorValue < 80 && leftSensorValue < 80)
   {
-    drive(150, LOW, 156, LOW);
+    drive(140, LOW, 146, LOW);
   }
   else if ((rightSensorValue > 80 && rightSensorValue < 1500) && leftSensorValue < 75)
   {
-    drive(LOW, 163, 206, LOW);
+    drive(LOW, 153, 196, LOW);
   }
   else if (rightSensorValue < 75 && (leftSensorValue > 80 && leftSensorValue < 1500))
   {
-    drive(200, LOW, LOW, 167);
+    drive(190, LOW, LOW, 157);
   }
   else if (rightSensorValue > 1500) 
   {
-    for (uint32_t tStart = millis(); (millis() - tStart) < 600;)
+    for (uint32_t tStart = millis(); (millis() - tStart) < 200;)
     {
-      drive(150, LOW, 156, LOW);
+      drive(140, LOW, 146, LOW);
     }
     if (rightSensorValue < 2000)
     {
-      for (uint32_t tStart = millis(); (millis() - tStart) < 600;)
+      for (uint32_t tStart = millis(); (millis() - tStart) < 100;)
       {
-        drive(LOW, 203, 206, LOW);
+        drive(LOW, 193, 196, LOW);
+      }
+      if ()
+
+      for (uint32_t tStart = millis(); (millis() - tStart) < 500;)
+      {
+        drive(LOW, 193, 196, LOW);
       }
     }
     

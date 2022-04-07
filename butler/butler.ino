@@ -16,7 +16,7 @@ int rightWheelBackward = 16;
 int leftWheelForward = 5;
 int leftWheelBackward = 18;
 
-//Turn duration
+//Turn duration (milliseconds)
 uint32_t duration = 400;
 
 //Adafruit SSD1306 (display)
@@ -74,6 +74,24 @@ uint16_t distance()
   return measureDistance.RangeMilliMeter;
 }
 
+//This function makes the robot turn right for a given amount of milliseconds
+void turnRightTemporarily(uint32_t milliseconds)
+{
+  for (uint32_t tStart = millis(); (millis()-tStart) < milliseconds;)
+  {
+    drive(LOW, 170, 177, LOW);
+  }
+}
+
+//This function makes the robot turn left for a given amount of milliseconds
+void turnLeftTemporarily(uint32_t milliseconds)
+{
+  for (uint32_t tStart = millis(); (millis()-tStart) < milliseconds;)
+  {
+    drive(173, LOW, LOW, 176);
+  }
+}
+
 //This function executes the butler game.
 void butler() 
 {
@@ -81,7 +99,7 @@ void butler()
   uint16_t distances[2];
   bool breakNextLoop = false;  
   drive(160, LOW, 165, LOW);
-  if (distance() <= 350)
+  if (distance() <= 320)
   {
     //Stand still and store the measured distance in distance[0] and distance[1].
     drive(0, 0, 0, 0);
@@ -103,34 +121,7 @@ void butler()
         //The variable "breakNextLoop" ensures that the robot wont look right after having found the opening.
         breakNextLoop = true;
         //Turn left for a bit longer so that the robot will not crash into the first part of the gate.
-        for (uint32_t tStart = millis(); (millis()-tStart) < 100;)
-        {
-          drive (173, LOW, LOW, 176);
-        }
-
-//        while (distance() > 260)
-//        {
-//          drive(160, LOW, 165, LOW);
-//        }
-
-//        for (uint32_t tStart = millis(); (millis()-tStart) < 150;)
-//        {
-//          drive(160, LOW, 165, LOW);
-//        }
-        //Drive towards the gate until the robot is 3 cm's or less from the wall.
-//        while (distance() > 300)
-//        {
-//          drive(160, LOW, 167, LOW);
-//        }
-//        //Turn right until the robot is able to go through the opening.
-//        while (distance() < 500)
-//        {
-//          drive(LOW, 160, 167, LOW);
-//        }
-//        for (uint32_t tStart = millis(); (millis()-tStart) < 50;)
-//        {
-//          drive (LOW, 160, 167, LOW);
-//        }
+        turnLeftTemporarily(95);
         break;
       }
     }
@@ -153,34 +144,7 @@ void butler()
       if (abs(distances[0] - distances[1]) >= 80)
       {
         //Turn right for a bit longer so that the robot will not crash into the first part of the gate.
-        for (uint32_t tStart = millis(); (millis()-tStart) < 100;)
-        {
-          drive (LOW, 170, 177, LOW);
-        }
-
-//        while (distance() > 260)
-//        {
-//          drive(160, LOW, 165, LOW);
-//        }
-
-//        for (uint32_t tStart = millis(); (millis()-tStart) < 150;)
-//        {
-//          drive(160, LOW, 165, LOW);
-//        }
-//        //Drive towards the gate until the robot is 3 cm's or less from the wall.
-//        while (distance() > 300)
-//        {
-//          drive(160, LOW, 167, LOW);
-//        }
-//        //Turn left until the robot is able to go through the opening.
-//        while (distance() < 550)
-//        {
-//          drive(163, LOW, LOW, 166);
-//        }
-//        for (uint32_t tStart = millis(); (millis()-tStart) < 50;)
-//        {
-//          drive (163, LOW, LOW, 166);
-//        }
+        turnRightTemporarily(95);
         break;
       }
     }

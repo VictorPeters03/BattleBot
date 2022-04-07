@@ -81,10 +81,7 @@ void butlerGame()
         //The variable "breakNextLoop" ensures that the robot wont look right after having found the opening.
         breakNextLoop = true;
         //Turn left for a bit longer so that the robot will not crash into the first part of the gate.
-        for (uint32_t tStart = millis(); (millis()-tStart) < 100;)
-        {
-          drive (173, LOW, LOW, 176);
-        }
+        turnLeftTemporarily(95);
 
         break;
       }
@@ -112,10 +109,7 @@ void butlerGame()
       if (abs(distances[0] - distances[1]) >= 80)
       {
         //Turn right for a bit longer so that the robot will not crash into the first part of the gate.
-        for (uint32_t tStart = millis(); (millis()-tStart) < 100;)
-        {
-          drive (LOW, 170, 177, LOW);
-        }
+        turnRightTemporarily(95);
 
         break;
       }
@@ -140,6 +134,23 @@ void drive(int rightForwardSpeed, int rightBackwardSpeed, int leftForwardSpeed, 
   analogWrite(leftBack, leftBackwardSpeed);
 }
 
+//This function makes the robot turn right for a given amount of milliseconds
+void turnRightTemporarily(uint32_t milliseconds)
+{
+  for (uint32_t tStart = millis(); (millis()-tStart) < milliseconds;)
+  {
+    drive(LOW, 170, 177, LOW);
+  }
+}
+
+//This function makes the robot turn left for a given amount of milliseconds
+void turnLeftTemporarily(uint32_t milliseconds)
+{
+  for (uint32_t tStart = millis(); (millis()-tStart) < milliseconds;)
+  {
+    drive(173, LOW, LOW, 176);
+  }
+}
 
 //This function returns the lidar's detected distance in milimeters.
 uint16_t distance()
