@@ -15,15 +15,15 @@ void handleRaceGame()
 
 void prepareRace()
 {
-    Serial.println("PREP RACE");
+    Serial.println("prep race");
     currentJob = "race";
     logScreen();
     //Setup the IR sensors.
     pinMode(RIGHT_IR_SENSOR, INPUT);
     pinMode(LEFT_IR_SENSOR, INPUT);
-    
-    std::string str = "{\"status\": \"true\", \"game\": \"race\"}";   
-      
+
+    std::string str = "{\"status\": true, \"game\": \"race\"}";
+
     Serial.println(str.c_str());
     webSocket.sendTXT(str.c_str());
 }
@@ -76,7 +76,9 @@ void raceGame()
 void stopRace()
 {
     isDriving = false;
-    status = "finish";
+    status = "finished";
+    gameStatus = "";
+    sendStatus();
     currentJob = "Waiting for command.";
     stopMove();
     //Send JSON.

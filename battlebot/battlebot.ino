@@ -27,6 +27,7 @@ boolean mpuIsWorking = false;
 boolean stop = false;
 //Used for tracking status and current game/task.
 char *status = "preparing";
+char *gameStatus = "";
 char *currentJob = "";
 //Used for non-blocking delays.
 unsigned long loopDelay = 0;
@@ -54,8 +55,6 @@ WebSocketsClient webSocket;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 MPU9250 mpu;
 
-boolean ready = false;
-
 void setup()
 {
     Serial.begin(9600);
@@ -76,26 +75,43 @@ void setup()
     display.setTextSize(1);
     display.setTextColor(WHITE);
 
+    //Wait until initilization is completed.
     delay(2000);
 
-    if(!mpu.setup(0x68))
+    if (!mpu.setup(0x68))
     {
-      Serial.println("Error starting MPU. ");
-      //currentJob = "Error starting MPU.";
-      //logScreen();
-      //stop = true;
-      //return;
-    }
-    else
+        Serial.println("Error starting MPU. ");
+        //currentJob = "Error starting MPU.";
+        //logScreen();
+        //stop = true;
+        //return;
+    } else
     {
-      mpuIsWorking = true;
-      currentJob = "Calibrating in 5 seconds.";
-      logScreen();
-      delay(5000);
-      currentJob = "Calibrating.";
-      logScreen();
-      mpu.calibrateAccelGyro();
+        mpuIsWorking = true;
+        currentJob = "Calibrating in 5 seconds.";
+        logScreen();
+        delay(5000);
+        currentJob = "Calibrating.";
+        logScreen();
+        mpu.calibrateAccelGyro();
     }
+    startConnection();
+
+    //server address, port and URL
+    webSocket.begin(HOST, PORT, PATH);
+
+    //Event handler
+    webSocket.onEvent(webSocketEvent);
+
+    //Tries to reconnect every 5 seconds.
+    webSocket.setReconnectInterval(5000);
+
+    status = "ready";
+    currentJob = "Waiting for command.";
+}
+
+void startConnection()
+{
     //Start WiFi connection.
     WiFi.begin(SSID, PASSWORD);
 
@@ -111,18 +127,6 @@ void setup()
     Serial.println(WiFi.localIP().toString());
     Serial.println("The MAC-Address is: ");
     Serial.println(WiFi.macAddress());
-
-    //server address, port and URL
-    webSocket.begin(HOST, PORT, PATH);
-
-    //Event handler
-    webSocket.onEvent(webSocketEvent);
-
-    //Tries to reconnect every 5 seconds.
-    webSocket.setReconnectInterval(5000);
-
-    status = "ready";
-    currentJob = "Waiting for command.";
 }
 
 
@@ -136,30 +140,45 @@ void loop()
     }
     //Send the status to the websocket server.
     sendStatus();
+
+    webSocket.loop();
+
     //If there is a delay active.
     if (millis() < loopDelay)
     {
         Serial.println("Delay");
         return;
     }
-    webSocket.loop();
-    //Run game loop code if a game is running.
-    if (currentJob == "race")
+
+    if (status == "in_game")
     {
-        handleRaceGame();
-    } else if (currentJob == "butler")
-    {
-        handleButlerGame();
+
+        //Run game loop code if a game is running.
+        if (currentJob == "race")
+        {
+            handleRaceGame();
+        } else if (currentJob == "butler")
+        {
+            handleButlerGame();
+        } else if (currentJob == "maze")
+        {
+            handleMazeGame();
+        }
+
     }
     logScreen();
     //Test code.
     //prepareRace();
 }
 
-boolean handleGameLoop(){
+/**
+ * Handles the 5 second ping for the games usign while loops.
+ */
+boolean handleGameLoop()
+{
     if (stop)
     {
-      drive(0, 0, 0, 0);
+        drive(0, 0, 0, 0);
         Serial.println("Stopped");
         return true;
     }
@@ -169,6 +188,9 @@ boolean handleGameLoop(){
     return status == "finish";
 }
 
+/**
+ * Logs the current status to the LCD screen.
+ */
 void logScreen()
 {
     //preparing       - De robot is nog niet klaar met opstarten
@@ -182,12 +204,18 @@ void logScreen()
     display.print("Status: ");
     display.print(status);
     display.println("");
+    display.print("Game Status:");
+    display.print(gameStatus);
+    display.println("");
     display.print(currentJob);
     display.println("");
     display.print("INF1C Robot");
     display.display();
 }
 
+/**
+ * Handles web socket communication.
+ */
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 {
     Serial.println(type);
@@ -196,7 +224,8 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
         case WStype_DISCONNECTED:
         {
             currentJob = "[WS] Disconnected!";
-            stop = true;
+            //stop = true;
+            startConnection();
             return;
         }
         case WStype_CONNECTED:
@@ -213,6 +242,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
             StaticJsonDocument<50> doc;
             deserializeJson(doc, payload);
 
+            //Check for errors.
             const char *error = doc["error"];
 
             if (error)
@@ -222,10 +252,10 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                 return;
             }
 
+            //Check if response is a login response.
             bool loginResponse = doc.containsKey("loggedin");
             if (loginResponse)
             {
-                Serial.println("Hallo!!");
                 JsonVariant loginStatus = doc["loggedin"];
                 bool loginStatusBool = loginStatus.as<bool>();
                 if (loginStatusBool)
@@ -245,18 +275,71 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
             String sGame = game.as<String>();
             String sAction = action.as<String>();
 
-            Serial.println("Ja!!");
-
-            /*if(sGame == NULL){
-             return;
-            }*/
-
-
             Serial.println(sGame);
-
             Serial.println(sAction);
 
-            gameCommand(sGame, sAction);
+            if (sAction == "start")
+            {
+                Serial.println("START");
+            }
+
+            //gameCommand(sGame, sAction);
+            //Prepare, start, stop.
+            //Check the action from the server and convert it into the format the robot uses.
+            //We store the status as the string we need to send back in the 5 second ping.
+            if (action == "prepare")
+            {
+                if (status == "in_game")
+                {
+                    webSocket.sendTXT("{\"error\": \"ALREADY_PLAYING_GAME\"}");
+                    return;
+                }
+                Serial.println("prepare");
+                status = "preparing_game";
+                gameStatus = status;
+                sendStatus();
+            } else if (action == "start")
+            {
+                if (status == "in_game")
+                {
+                    webSocket.sendTXT("{\"error\": \"ALREADY_PLAYING_GAME\"}");
+                    return;
+                }
+                if (status != "preparing_game")
+                {
+                    webSocket.sendTXT("{\"error\": \"GAME_NOT_PREPARED\"}");
+                    return;
+                }
+
+                Serial.println("in_game");
+                status = "in_game";
+                gameStatus = status;
+                sendStatus();
+            } else if (action == "ended")
+            {
+                if (gameStatus == "in_game")
+                {
+                    status = "finished";
+                    gameStatus = status;
+                } else
+                {
+                    return;
+                }
+            }
+
+            if (game == "race")
+            {
+                handleRaceGame();
+            } else if (game == "butler")
+            {
+                handleButlerGame();
+            } else if (game == "maze")
+            {
+                handleMazeGame();
+            } else
+            {
+                webSocket.sendTXT("{\"error\": \"GAME_NOT_FOUND\"}");
+            }
             break;
         }
         case WStype_ERROR:
@@ -273,74 +356,30 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 
 void gameCommand(String game, String action)
 {
-    //Prepare, start, stop.
-    if (action == "prepare")
-    {
-        if (status == "in_game")
-        {
-            webSocket.sendTXT("{\"error\": \"ALREADY_PLAYING_GAME\"}");
-            return;
-        }
-        Serial.println("PREPARE!!!");
-        status = "preparing_game";
-    } 
-    else if (action == "start")
-    {
-        if (status == "in_game")
-        {
-            webSocket.sendTXT("{\"error\": \"ALREADY_PLAYING_GAME\"}");
-            return;
-        }
-        if (status != "preparing_game")
-        {
-            webSocket.sendTXT("{\"error\": \"GAME_NOT_PREPARED\"}");
-            return;
-        }
 
-        Serial.println("IN_GAME!!!");
-        status = "in_game";
-    } 
-    else if (action == "ended")
-    {
-        status = "finished";
-    }
-
-    if (game == "race")
-    {
-        handleRaceGame();
-    } 
-    else if (game == "butler")
-    {
-        handleButlerGame();
-    } 
-    else if (game == "maze")
-    {
-
-    } 
-    else
-    {
-        webSocket.sendTXT("{\"error\": \"GAME_NOT_FOUND\"}");
-    }
 }
 
+//Send a response to the server every 5 seconds with the acceleration, status and if the robot is driving.
 void sendStatus()
 {
-  float accel = 0;
-  if(mpuIsWorking)
-  {
-    if(mpu.update())
-    {
-      accel = mpu.getAccBiasX() * 1000.f / (float)MPU9250::CALIB_ACCEL_SENSITIVITY;
-      Serial.print(accel);
-      }
-     }
+    //If delay is more than the current time, return.
     if (millis() < statusDelay)
     {
-        //Serial.println("Delay2");
         return;
     }
 
-    //const char* cStatus = status;
+    float accel = 0;
+    //If MPU is not found send 0.
+    if (mpuIsWorking)
+    {
+        if (mpu.update())
+        {
+            accel = mpu.getAccBiasX() * 1000.f / (float) MPU9250::CALIB_ACCEL_SENSITIVITY;
+            Serial.print(accel);
+        }
+    }
+
+    //Add the float to the string.
     std::ostringstream ss;
     ss << accel;
 
@@ -348,6 +387,11 @@ void sendStatus()
                       (isDriving ? "true" : "false") + ", \"acceleration\": " + ss.str() + "}";
     Serial.println(str.c_str());
     webSocket.sendTXT(str.c_str());
+    //Set the delay for this function to current time + 5 seconds.
     statusDelay = millis() + 5000;
+    if (status == "preparing_game" || status == "finished")
+    {
+        status = "ready";
+    }
 
 }
