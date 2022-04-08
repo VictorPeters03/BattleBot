@@ -9,10 +9,10 @@ ESP32 Battlebot Project van INF1C
 - Butler
 
 ### De volgende libraries moeten geïnstalleerd worden.
-https://github.com/Links2004/arduinoWebSockets
-https://github.com/ERROPiX/ESP32_AnalogWrite
-https://github.com/adafruit/Adafruit_SSD1306
-https://arduinojson.org/
-https://github.com/adafruit/Adafruit-GFX-Library
-https://github.com/adafruit/Adafruit_VL53L0X
-https://github.com/hideakitai/MPU9250
+https://github.com/Links2004/arduinoWebSockets <br/>
+https://github.com/ERROPiX/ESP32_AnalogWrite <br/>
+https://github.com/adafruit/Adafruit_SSD1306 <br/>
+https://arduinojson.org/ <br/>
+https://github.com/adafruit/Adafruit-GFX-Library <br/>
+https://github.com/adafruit/Adafruit_VL53L0X <br/>
+https://github.com/hideakitai/MPU9250 <br/>
