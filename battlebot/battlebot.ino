@@ -27,7 +27,7 @@ boolean mpuIsWorking = false;
 boolean stop = false;
 //Used for tracking status and current game/task.
 char *status = "preparing";
-char *gameStatus = "";
+char* gameStatus = "";
 char *currentJob = "";
 //Used for non-blocking delays.
 unsigned long loopDelay = 0;
@@ -110,9 +110,8 @@ void setup()
     currentJob = "Waiting for command.";
 }
 
-void startConnection()
-{
-    //Start WiFi connection.
+void startConnection(){
+      //Start WiFi connection.
     WiFi.begin(SSID, PASSWORD);
 
     while (WiFi.status() != WL_CONNECTED)
@@ -140,7 +139,7 @@ void loop()
     }
     //Send the status to the websocket server.
     sendStatus();
-
+    
     webSocket.loop();
 
     //If there is a delay active.
@@ -150,21 +149,20 @@ void loop()
         return;
     }
 
-    if (status == "in_game")
+    if(status == "in_game"){
+
+    //Run game loop code if a game is running.
+    if (currentJob == "race")
     {
-
-        //Run game loop code if a game is running.
-        if (currentJob == "race")
-        {
-            handleRaceGame();
-        } else if (currentJob == "butler")
-        {
-            handleButlerGame();
-        } else if (currentJob == "maze")
-        {
-            handleMazeGame();
-        }
-
+        handleRaceGame();
+    } else if (currentJob == "butler")
+    {
+        handleButlerGame();
+    } else if (currentJob == "maze")
+    {
+        handleMazeGame();
+    }
+          
     }
     logScreen();
     //Test code.
@@ -278,68 +276,65 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
             Serial.println(sGame);
             Serial.println(sAction);
 
-            if (sAction == "start")
-            {
-                Serial.println("START");
+            if(sAction == "start"){
+              Serial.println("START");
             }
 
             //gameCommand(sGame, sAction);
-            //Prepare, start, stop.
-            //Check the action from the server and convert it into the format the robot uses.
-            //We store the status as the string we need to send back in the 5 second ping.
-            if (action == "prepare")
-            {
-                if (status == "in_game")
-                {
-                    webSocket.sendTXT("{\"error\": \"ALREADY_PLAYING_GAME\"}");
-                    return;
-                }
-                Serial.println("prepare");
-                status = "preparing_game";
-                gameStatus = status;
-                sendStatus();
-            } else if (action == "start")
-            {
-                if (status == "in_game")
-                {
-                    webSocket.sendTXT("{\"error\": \"ALREADY_PLAYING_GAME\"}");
-                    return;
-                }
-                if (status != "preparing_game")
-                {
-                    webSocket.sendTXT("{\"error\": \"GAME_NOT_PREPARED\"}");
-                    return;
-                }
+                //Prepare, start, stop.
+    //Check the action from the server and convert it into the format the robot uses.
+    //We store the status as the string we need to send back in the 5 second ping.
+    if (action == "prepare")
+    {
+        if (status == "in_game")
+        {
+            webSocket.sendTXT("{\"error\": \"ALREADY_PLAYING_GAME\"}");
+            return;
+        }
+        Serial.println("prepare");
+        status = "preparing_game";
+        gameStatus = status;
+        sendStatus();
+    } else if (action == "start")
+    {
+        if (status == "in_game")
+        {
+            webSocket.sendTXT("{\"error\": \"ALREADY_PLAYING_GAME\"}");
+            return;
+        }
+        if (status != "preparing_game")
+        {
+            webSocket.sendTXT("{\"error\": \"GAME_NOT_PREPARED\"}");
+            return;
+        }
 
-                Serial.println("in_game");
-                status = "in_game";
-                gameStatus = status;
-                sendStatus();
-            } else if (action == "ended")
-            {
-                if (gameStatus == "in_game")
-                {
-                    status = "finished";
-                    gameStatus = status;
-                } else
-                {
-                    return;
-                }
-            }
+        Serial.println("in_game");
+        status = "in_game";
+        gameStatus = status;
+        sendStatus();
+    } else if (action == "ended")
+    {
+      if(gameStatus == "in_game"){
+        status = "finished";
+        gameStatus = status;
+      } else {
+        return;
+      }
+    }
 
-            if (game == "race")
-            {
-                handleRaceGame();
-            } else if (game == "butler")
-            {
-                handleButlerGame();
-            } else if (game == "maze")
-            {
-                handleMazeGame();
-            } else
-            {
-                webSocket.sendTXT("{\"error\": \"GAME_NOT_FOUND\"}");
-            }
+    if (game == "race")
+    {
+        handleRaceGame();
+    } else if (game == "butler")
+    {
+        handleButlerGame();
+    } else if (game == "maze")
+    {
+      handleMazeGame();
+    } else
+    {
+        webSocket.sendTXT("{\"error\": \"GAME_NOT_FOUND\"}");
+    }
             break;
         }
         case WStype_ERROR:
@@ -352,11 +347,6 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
         case WStype_FRAGMENT_FIN:
             break;
     }
-}
-
-void gameCommand(String game, String action)
-{
-
 }
 
 //Send a response to the server every 5 seconds with the acceleration, status and if the robot is driving.
@@ -389,9 +379,8 @@ void sendStatus()
     webSocket.sendTXT(str.c_str());
     //Set the delay for this function to current time + 5 seconds.
     statusDelay = millis() + 5000;
-    if (status == "preparing_game" || status == "finished")
-    {
-        status = "ready";
+    if(status == "preparing_game" || status == "finished"){
+      status = "ready";
     }
 
 }

@@ -153,6 +153,7 @@ void mazeGame()
 
 void stopMaze()
 {
+  drive(0, 0, 0, 0)
     isDriving = false;
     status = "finished";
     gameStatus = "";
